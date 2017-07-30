@@ -42,4 +42,4 @@ The proposed lane detection algorithm is very simple and it is expected to fail 
 Those are possible improvements to the algorithm:
 - apply an homography to the image to have a top-view visualization. This will facilitate the curve fitting techniques, since all the points of the line are more homogeneously weighted
 - use a higher order polynomial as a fitting function. Usually a 3rd order polynomial is recommended.
-- since lane markings are either yellow or white, we extract isolate colors from the image before converting to a greyscale.
+- since lane markings are either yellow or white, we could isolate such colors from the image before converting to a greyscale.
