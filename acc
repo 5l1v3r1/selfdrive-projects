@@ -1,6 +1,0 @@
-def random_function(a):
-    a += 31
-    return a
-
-x = random_function(20)
-print(x)
