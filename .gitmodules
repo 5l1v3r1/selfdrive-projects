@@ -1,0 +1,8 @@
+[submodule "CarND-MPC-Project"]
+	path = CarND-MPC-Project
+	url = git@github.com:rbiasini/CarND-MPC-Project.git
+	branch = master
+[submodule "CarND-MPC-Quizzes"]
+	path = CarND-MPC-Quizzes
+	url = git@github.com:rbiasini/CarND-MPC-Quizzes.git
+	branch = master
