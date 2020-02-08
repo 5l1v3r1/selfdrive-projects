@@ -6,3 +6,7 @@
 	path = CarND-MPC-Quizzes
 	url = git@github.com:rbiasini/CarND-MPC-Quizzes.git
 	branch = master
+[submodule "kalman-filter-course-assignments"]
+	path = kalman-filter-course-assignments
+	url = git@github.com:rbiasini/kalman-filter-course-assignments.git
+	branch = master
