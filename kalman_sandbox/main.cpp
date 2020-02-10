@@ -10,7 +10,6 @@ using namespace std;
 using namespace Eigen;
 namespace plt = matplotlibcpp;
 
-Matrix2d cov_y(2, 2);
 
 double wraptopi(double x) {
   if (x > M_PI) {
@@ -22,10 +21,11 @@ double wraptopi(double x) {
 }
 
 
-void measurement_update(vector<double> &lk, double rk, double bk, Matrix<double,3,3> &P_check, Matrix<double,3,1> &x) {
+void measurement_update(vector<double> &lk, double rk, double bk, Matrix<double,3,3> &P_check, Matrix<double,3,1> &x, Matrix<double,2,2> cov_y) {
 
   bk = wraptopi(bk);
 
+  // 1. Compute measurement Jacobian
   Matrix<double,2,1> y;
   double dist = pow(lk[0] - x(0, 0), 2) + pow((lk[1] - x(1, 0)), 2);
   y(0, 0) = sqrt(dist);
@@ -37,8 +37,10 @@ void measurement_update(vector<double> &lk, double rk, double bk, Matrix<double,
   H << (x(0, 0) - lk[0]) / sqrt(dist), (x(1, 0) - lk[1]) / sqrt(dist), 0,
        -(x(1, 0) - lk[1]) / dist, -(-x(0, 0) + lk[0]) / dist, -1;
 
+  // 2. Compute Kalman Gain
   auto K = P_check * (H.transpose()) * ((H*P_check * (H.transpose()) + cov_y).inverse());
 
+  // 3. Correct predicted state
   Matrix<double,2,1> y_m;
   y_m << rk, bk;
 
@@ -49,9 +51,9 @@ void measurement_update(vector<double> &lk, double rk, double bk, Matrix<double,
   x = x + K * y_d;
   x(2, 0) = wraptopi(x(2, 0));
 
-  P_check = (MatrixXd::Identity(3, 3) - K * H) * P_check;
+  // 4. Correct covariance
+  P_check = (Matrix3d::Identity() - K * H) * P_check;
 }
-
 
 
 int main() {
@@ -84,6 +86,7 @@ int main() {
   Q_km << v_var, 0,
           0, om_var;
 
+  Matrix<double,2,2> cov_y;
   cov_y << r_var, 0,
           0, b_var;
 
@@ -128,7 +131,7 @@ int main() {
 
     // 5. Update state estimate using available landmark measurements
     for (int i=0; i<r[k].size(); i++) {
-      measurement_update(l[i], r[k][i], b[k][i], P_check, x_check);
+      measurement_update(l[i], r[k][i], b[k][i], P_check, x_check, cov_y);
     }
 
     // Set final state predictions for timestep
@@ -140,6 +143,7 @@ int main() {
 
   cout << P_est[1]<<endl;
 
+  // plot
   vector<double> xs,ys, ths;
 
   for (auto x:x_est) {
@@ -153,9 +157,4 @@ int main() {
 
   plt::plot(t, ths);
   plt::show();
-
-  //// write prettified JSON to another file
-  //std::ofstream o("pretty.json");
-  //o << std::setw(4) << j << std::endl;
-
 }
